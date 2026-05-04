@@ -1,0 +1,95 @@
+.filter-sidebar {
+  width: 280px;
+  background: white;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  padding: 20px;
+  height: fit-content;
+  position: sticky;
+  top: 90px;
+}
+
+.filter-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #DEE2E6;
+}
+
+.filter-section {
+  margin-bottom: 24px;
+}
+
+.filter-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #495057;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.filter-option input[type="radio"] {
+  accent-color: #3498DB;
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-input {
+  width: 80px;
+  padding: 8px 12px;
+  border: 1px solid #CED4DA;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #3498DB;
+}
+
+.price-separator {
+  color: #6C757D;
+}
+
+.clear-filters-btn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #CED4DA;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-filters-btn:hover {
+  background: #F8F9FA;
+  border-color: #ADB5BD;
+}
+
+@media (max-width: 1024px) {
+  .filter-sidebar {
+    width: 100%;
+    position: static;
+    margin-bottom: 20px;
+  }
+}
