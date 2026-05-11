@@ -1,31 +1,41 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  selectCartItems,
+  selectCartPromoCode,
+  removeFromCart,
+  updateQuantity,
+  applyPromoCode,
+  selectCartTotal,
+  selectDiscountAmount,
+  selectFinalTotal,
+  selectDeliveryCost,
+  selectCartItemCount
+} from '../store/cartSlice';
 import './Cart.css';
 
 const Cart = () => {
   const navigate = useNavigate();
-  const {
-    cart,
-    removeFromCart,
-    updateQuantity,
-    promoCode,
-    applyPromoCode,
-    getCartTotal,
-    getDiscountAmount,
-    getFinalTotal,
-    getFreeDeliveryThreshold,
-    getDeliveryCost
-  } = useCart();
-
+  const dispatch = useDispatch();
+  const cart = useSelector(selectCartItems);
+  const promoCode = useSelector(selectCartPromoCode);
+  const cartTotal = useSelector(selectCartTotal);
+  const discountAmount = useSelector(selectDiscountAmount);
+  const finalTotal = useSelector(selectFinalTotal);
+  const deliveryCost = useSelector(selectDeliveryCost);
+  const itemCount = useSelector(selectCartItemCount);
+  
   const [promoInput, setPromoInput] = useState('');
   const [promoError, setPromoError] = useState('');
 
   const handleApplyPromo = () => {
-    const success = applyPromoCode(promoInput.toUpperCase());
-    if (success) {
-      setPromoError('');
-    } else {
+    const code = promoInput.toUpperCase();
+    dispatch(applyPromoCode(code));
+    if (code !== 'SALE10' && code !== 'SALE20') {
       setPromoError('Неверный промокод');
+    } else {
+      setPromoError('');
     }
   };
 
@@ -61,14 +71,14 @@ const Cart = () => {
                 </div>
                 <div className="item-quantity">
                   <button 
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    onClick={() => dispatch(updateQuantity({ productId: item.id, quantity: item.quantity - 1 }))}
                     className="qty-btn"
                   >
                     −
                   </button>
                   <span className="qty-value">{item.quantity}</span>
                   <button 
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => dispatch(updateQuantity({ productId: item.id, quantity: item.quantity + 1 }))}
                     className="qty-btn"
                   >
                     +
@@ -78,7 +88,7 @@ const Cart = () => {
                   {(item.price * item.quantity).toFixed(2)} ₽
                 </div>
                 <button 
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => dispatch(removeFromCart(item.id))}
                   className="remove-btn"
                 >
                   ×
@@ -107,31 +117,31 @@ const Cart = () => {
             
             <div className="summary-rows">
               <div className="summary-row">
-                <span>Товары ({cart.reduce((sum, item) => sum + item.quantity, 0)})</span>
-                <span>{getCartTotal().toFixed(2)} ₽</span>
+                <span>Товары ({itemCount})</span>
+                <span>{cartTotal.toFixed(2)} ₽</span>
               </div>
-              {discount > 0 && (
+              {promoCode && (
                 <div className="summary-row discount">
                   <span>Скидка ({promoCode})</span>
-                  <span>-{getDiscountAmount().toFixed(2)} ₽</span>
+                  <span>-{discountAmount.toFixed(2)} ₽</span>
                 </div>
               )}
               <div className="summary-row">
                 <span>Доставка</span>
                 <span>
-                  {getDeliveryCost() === 0 
+                  {deliveryCost === 0 
                     ? 'Бесплатно' 
-                    : `${getDeliveryCost()} ₽`}
+                    : `${deliveryCost} ₽`}
                 </span>
               </div>
-              {getCartTotal() < getFreeDeliveryThreshold() && (
+              {cartTotal < 1000 && (
                 <div className="delivery-info">
-                  До бесплатной доставки осталось: {getFreeDeliveryThreshold() - getCartTotal()} ₽
+                  До бесплатной доставки осталось: {(1000 - cartTotal).toFixed(2)} ₽
                 </div>
               )}
               <div className="summary-row total">
                 <span>Итого</span>
-                <span>{(getFinalTotal() + getDeliveryCost()).toFixed(2)} ₽</span>
+                <span>{(finalTotal + deliveryCost).toFixed(2)} ₽</span>
               </div>
             </div>
             
@@ -147,7 +157,5 @@ const Cart = () => {
     </div>
   );
 };
-
-import { useState } from 'react';
 
 export default Cart;

@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../store/cartSlice';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
-  const { addToCart } = useCart();
+  const dispatch = useDispatch();
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    addToCart(product);
+    dispatch(addToCart({ product, quantity: 1 }));
   };
 
   return (

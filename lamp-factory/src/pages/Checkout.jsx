@@ -1,11 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { createOrder } from '../store/ordersSlice';
+import { clearCart, selectCartItems, selectCartTotal, selectDiscountAmount, selectFinalTotal, selectDeliveryCost } from '../store/cartSlice';
 import './Checkout.css';
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { cart, clearCart, getCartTotal, getDiscountAmount, getFinalTotal, getDeliveryCost } = useCart();
+  const dispatch = useDispatch();
+  const cart = useSelector(selectCartItems);
+  const cartTotal = useSelector(selectCartTotal);
+  const discountAmount = useSelector(selectDiscountAmount);
+  const finalTotal = useSelector(selectFinalTotal);
+  const deliveryCost = useSelector(selectDeliveryCost);
   
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -48,17 +55,25 @@ const Checkout = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) return;
     if (cart.length === 0) return;
 
-    const orderId = Math.floor(100000 + Math.random() * 900000);
+    const orderData = {
+      ...formData,
+      items: cart,
+      total: finalTotal + deliveryCost
+    };
     
-    clearCart();
-    
-    navigate(`/confirmation/${orderId}`);
+    try {
+      const result = await dispatch(createOrder(orderData)).unwrap();
+      dispatch(clearCart());
+      navigate(`/confirmation/${result.orderId}`);
+    } catch (error) {
+      console.error('Ошибка создания заказа:', error);
+    }
   };
 
   if (cart.length === 0) {
@@ -246,19 +261,19 @@ const Checkout = () => {
             <h3>Итого к оплате</h3>
             <div className="summary-row">
               <span>Товары</span>
-              <span>{getCartTotal().toFixed(2)} ₽</span>
+              <span>{cartTotal.toFixed(2)} ₽</span>
             </div>
             <div className="summary-row">
               <span>Скидка</span>
-              <span>-{getDiscountAmount().toFixed(2)} ₽</span>
+              <span>-{discountAmount.toFixed(2)} ₽</span>
             </div>
             <div className="summary-row">
               <span>Доставка</span>
-              <span>{getDeliveryCost() === 0 ? 'Бесплатно' : `${getDeliveryCost()} ₽`}</span>
+              <span>{deliveryCost === 0 ? 'Бесплатно' : `${deliveryCost} ₽`}</span>
             </div>
             <div className="summary-row total">
               <span>Итого</span>
-              <span>{(getFinalTotal() + getDeliveryCost()).toFixed(2)} ₽</span>
+              <span>{(finalTotal + deliveryCost).toFixed(2)} ₽</span>
             </div>
             <button type="submit" className="submit-btn">
               Подтвердить заказ

@@ -1,16 +1,19 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { products } from '../data/mockProducts';
-import { useCart } from '../context/CartContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProducts, selectAllProducts } from '../store/productsSlice';
+import { addToCart } from '../store/cartSlice';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const dispatch = useDispatch();
+  const products = useSelector(selectAllProducts);
   
   const product = products.find(p => p.id === Number(id));
 
   if (!product) {
+    dispatch(fetchProducts());
     return (
       <div className="product-not-found">
         <h2>Товар не найден</h2>
@@ -20,7 +23,7 @@ const ProductDetail = () => {
   }
 
   const handleAddToCart = () => {
-    addToCart(product);
+    dispatch(addToCart({ product, quantity: 1 }));
     navigate('/cart');
   };
 

@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useSelector } from 'react-redux';
+import { selectCartItemCount } from '../store/cartSlice';
 import './Header.css';
 
 const Header = () => {
-  const { getCartItemCount } = useCart();
-  const itemCount = getCartItemCount();
+  const itemCount = useSelector(selectCartItemCount);
 
   return (
     <header className="header">

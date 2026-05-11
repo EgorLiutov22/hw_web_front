@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { CartProvider } from './context/CartContext';
+import { Provider } from 'react-redux';
+import { store } from './store';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Catalog from './pages/Catalog';
@@ -10,7 +11,7 @@ import Confirmation from './pages/Confirmation';
 
 function App() {
   return (
-    <CartProvider>
+    <Provider store={store}>
       <BrowserRouter>
         <div className="app">
           <Header />
@@ -26,7 +27,7 @@ function App() {
           <Footer />
         </div>
       </BrowserRouter>
-    </CartProvider>
+    </Provider>
   );
 }
 
